@@ -81,6 +81,6 @@ jobs:
           export MAVEN_OPTS="${MAVEN_INSTALL_OPTS}"
           $MAVEN clean install ${MAVEN_FAST_INSTALL} -pl '!:trino-docs,!:trino-server-rpm'
           core/docker/build.sh -a amd64
-          docker tag trino:461-SNAPSHOT prabodhtr/trino:custom-trino-461-amd64
+          docker tag trino:461-SNAPSHOT-amd64 prabodhtr/trino:custom-trino-461-amd64
           docker push prabodhtr/trino:custom-trino-461-amd64
         
