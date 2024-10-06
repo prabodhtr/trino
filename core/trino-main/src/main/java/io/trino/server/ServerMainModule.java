@@ -484,6 +484,10 @@ public class ServerMainModule
         // TODO: remove this when system tables are bound separately for coordinator and worker
         newOptionalBinder(binder, RuleStatsRecorder.class);
 
+        // coodinator announcer
+        binder.bind(CoordintorAnnouncer.class).in(Scopes.SINGLETON);
+        configBinder(binder).bindConfig(CoordinatorAnnouncerConfig.class);
+
         // cleanup
         closingBinder(binder).registerExecutor(Key.get(ScheduledExecutorService.class, ForExchange.class));
         closingBinder(binder).registerExecutor(Key.get(ExecutorService.class, ForAsyncHttp.class));

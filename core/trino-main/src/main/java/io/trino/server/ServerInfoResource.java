@@ -63,10 +63,13 @@ public class ServerInfoResource
     @ResourceSecurity(PUBLIC)
     @GET
     @Produces(APPLICATION_JSON)
-    public ServerInfo getInfo()
+    public Response getInfo()
     {
         boolean starting = !startupStatus.isStartupComplete();
-        return new ServerInfo(version, environment, coordinator, starting, Optional.of(nanosSince(startTime)));
+        Response.Status status = starting ? Response.Status.SERVICE_UNAVAILABLE : Response.Status.OK;
+        return Response.status(status)
+                .entity(new ServerInfo(version, environment, coordinator, starting, Optional.of(nanosSince(startTime))))
+                .build();
     }
 
     @ResourceSecurity(MANAGEMENT_WRITE)

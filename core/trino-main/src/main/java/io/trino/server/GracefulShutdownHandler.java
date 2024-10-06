@@ -51,6 +51,7 @@ public class GracefulShutdownHandler
     private final boolean isCoordinator;
     private final ShutdownAction shutdownAction;
     private final Duration gracePeriod;
+    private final CoordintorAnnouncer coordintorAnnouncer;
 
     @GuardedBy("this")
     private boolean shutdownRequested;
@@ -60,11 +61,12 @@ public class GracefulShutdownHandler
             SqlTaskManager sqlTaskManager,
             ServerConfig serverConfig,
             ShutdownAction shutdownAction,
-            LifeCycleManager lifeCycleManager)
+            LifeCycleManager lifeCycleManager, CoordintorAnnouncer coordintorAnnouncer)
     {
         this.sqlTaskManager = requireNonNull(sqlTaskManager, "sqlTaskManager is null");
         this.shutdownAction = requireNonNull(shutdownAction, "shutdownAction is null");
         this.lifeCycleManager = requireNonNull(lifeCycleManager, "lifeCycleManager is null");
+        this.coordintorAnnouncer = requireNonNull(coordintorAnnouncer, "coordintorAnnouncer is null");
         this.isCoordinator = serverConfig.isCoordinator();
         this.gracePeriod = serverConfig.getGracePeriod();
     }
@@ -138,6 +140,8 @@ public class GracefulShutdownHandler
         catch (ExecutionException e) {
             log.warn(e, "Problem stopping the life cycle");
         }
+
+        coordintorAnnouncer.unannounce();
 
         shutdownAction.onShutdown();
     }

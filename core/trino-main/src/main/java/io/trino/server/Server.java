@@ -194,6 +194,8 @@ public class Server
 
             injector.getInstance(Announcer.class).start();
 
+            injector.getInstance(CoordintorAnnouncer.class).announce();
+
             injector.getInstance(StartupStatus.class).startupComplete();
             log.info("Server startup completed in %s", Duration.nanosSince(startTime).convertToMostSuccinctTimeUnit());
             log.info("======== SERVER STARTED ========");
