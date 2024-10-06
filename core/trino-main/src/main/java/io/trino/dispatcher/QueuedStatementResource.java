@@ -68,6 +68,9 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.concurrent.ConcurrentHashMap;
@@ -168,7 +171,13 @@ public class QueuedStatementResource
 
         Query query = registerQuery(statement, servletRequest, httpHeaders);
 
-        return createQueryResultsResponse(query.getQueryResults(query.getLastToken(), externalUriInfo));
+        Map<String, String> customResponseHeaders = new HashMap<>();
+        customResponseHeaders.put("X-Query-ID", query.getQueryId().getId());
+
+        Optional.ofNullable(httpHeaders.getHeaderString("X-Cluster-ID"))
+                .ifPresent(id -> customResponseHeaders.put("X-Cluster-ID", id));
+
+        return createQueryResultsResponse(query.getQueryResults(query.getLastToken(), externalUriInfo), customResponseHeaders);
     }
 
     private Query registerQuery(String statement, HttpServletRequest servletRequest, HttpHeaders httpHeaders)
@@ -219,7 +228,7 @@ public class QueuedStatementResource
                 .catching(TimeoutException.class, _ -> null, directExecutor())
                 // when state changes, fetch the next result
                 .transform(_ -> query.getQueryResults(token, externalUriInfo), responseExecutor)
-                .transform(this::createQueryResultsResponse, directExecutor());
+                .transform(result -> createQueryResultsResponse(result, Collections.emptyMap()), directExecutor());
     }
 
     @ResourceSecurity(PUBLIC)
@@ -245,12 +254,13 @@ public class QueuedStatementResource
         return query;
     }
 
-    private Response createQueryResultsResponse(QueryResults results)
+    private Response createQueryResultsResponse(QueryResults results, Map<String, String> responseHeaders)
     {
         Response.ResponseBuilder builder = Response.ok(results);
         if (!compressionEnabled) {
             builder.encoding("identity");
         }
+        responseHeaders.forEach(builder::header);
         return builder.build();
     }
 
