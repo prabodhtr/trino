@@ -90,6 +90,8 @@ public class GracefulShutdownHandler
 
     private void shutdown()
     {
+        coordintorAnnouncer.unannounce();
+
         List<TaskInfo> activeTasks = getActiveTasks();
 
         // At this point no new tasks should be scheduled by coordinator on this worker node.
@@ -140,8 +142,6 @@ public class GracefulShutdownHandler
         catch (ExecutionException e) {
             log.warn(e, "Problem stopping the life cycle");
         }
-
-        coordintorAnnouncer.unannounce();
 
         shutdownAction.onShutdown();
     }
