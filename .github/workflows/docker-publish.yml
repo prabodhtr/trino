@@ -9,7 +9,9 @@
 
 name: Publish Docker Image
 
-on: workflow_dispatch
+on: 
+  push:
+    branches: [ "envoy_integration" ]
 
 defaults:
   run:
