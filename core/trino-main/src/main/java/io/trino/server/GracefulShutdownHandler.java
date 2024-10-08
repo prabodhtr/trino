@@ -51,7 +51,6 @@ public class GracefulShutdownHandler
     private final boolean isCoordinator;
     private final ShutdownAction shutdownAction;
     private final Duration gracePeriod;
-    private final CoordintorAnnouncer coordintorAnnouncer;
 
     @GuardedBy("this")
     private boolean shutdownRequested;
@@ -61,12 +60,11 @@ public class GracefulShutdownHandler
             SqlTaskManager sqlTaskManager,
             ServerConfig serverConfig,
             ShutdownAction shutdownAction,
-            LifeCycleManager lifeCycleManager, CoordintorAnnouncer coordintorAnnouncer)
+            LifeCycleManager lifeCycleManager)
     {
         this.sqlTaskManager = requireNonNull(sqlTaskManager, "sqlTaskManager is null");
         this.shutdownAction = requireNonNull(shutdownAction, "shutdownAction is null");
         this.lifeCycleManager = requireNonNull(lifeCycleManager, "lifeCycleManager is null");
-        this.coordintorAnnouncer = requireNonNull(coordintorAnnouncer, "coordintorAnnouncer is null");
         this.isCoordinator = serverConfig.isCoordinator();
         this.gracePeriod = serverConfig.getGracePeriod();
     }
@@ -90,8 +88,6 @@ public class GracefulShutdownHandler
 
     private void shutdown()
     {
-        coordintorAnnouncer.unannounce();
-
         List<TaskInfo> activeTasks = getActiveTasks();
 
         // At this point no new tasks should be scheduled by coordinator on this worker node.

@@ -112,6 +112,7 @@ public class Server
         modules.add(
                 new NodeModule(),
                 new DiscoveryModule(),
+                new EnvoyAnnouncerModule(),
                 new HttpServerModule(),
                 new JsonModule(),
                 new JaxrsModule(),
@@ -194,7 +195,7 @@ public class Server
 
             injector.getInstance(Announcer.class).start();
 
-            injector.getInstance(CoordintorAnnouncer.class).announce();
+            injector.getInstance(EnvoyAnnouncer.class).start();
 
             injector.getInstance(StartupStatus.class).startupComplete();
             log.info("Server startup completed in %s", Duration.nanosSince(startTime).convertToMostSuccinctTimeUnit());
