@@ -26,6 +26,7 @@ import io.airlift.units.Duration;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.URI;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
@@ -70,12 +71,12 @@ public class EnvoyAnnouncementClient {
                 .setHeader("Content-Type", MEDIA_TYPE_JSON.toString())
                 .build();
 
-        return httpClient.executeAsync(request, new EnvoyResponseHandler<Duration>("envoyAnnouncement", uri) {
+        return httpClient.executeAsync(request, new EnvoyResponseHandler<>("envoyAnnouncement", uri) {
             @Override
             public Duration handle(Request request, Response response) throws RuntimeException {
                 int statusCode = response.getStatusCode();
                 if (!isSuccess(statusCode)) {
-                    throw new RuntimeException(String.format(
+                    throw new DiscoveryException(String.format(
                             "Announcement to envoy failed with status code %s: %s",
                             statusCode,
                             getBodyForError(response)));
@@ -159,6 +160,9 @@ public class EnvoyAnnouncementClient {
             }
             if (exception instanceof CancellationException) {
                 throw new DiscoveryException(name + " was canceled for " + uri);
+            }
+            if (exception instanceof ConnectException) {
+                throw new DiscoveryException("Unable to connect to envoy registry URI " + uri);
             }
             if (exception instanceof DiscoveryException) {
                 throw (DiscoveryException) exception;
