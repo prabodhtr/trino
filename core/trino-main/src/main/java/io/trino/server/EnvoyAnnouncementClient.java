@@ -73,7 +73,7 @@ public class EnvoyAnnouncementClient {
 
         return httpClient.executeAsync(request, new EnvoyResponseHandler<>("envoyAnnouncement", uri) {
             @Override
-            public Duration handle(Request request, Response response) throws RuntimeException {
+            public Duration handle(Request request, Response response) throws DiscoveryException {
                 int statusCode = response.getStatusCode();
                 if (!isSuccess(statusCode)) {
                     throw new DiscoveryException(String.format(

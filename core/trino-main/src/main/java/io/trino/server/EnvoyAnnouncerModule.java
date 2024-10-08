@@ -23,14 +23,9 @@ public class EnvoyAnnouncerModule extends AbstractConfigurationAwareModule {
 
     @Override
     protected void setup(Binder binder) {
-        if (buildConfigObject(ServerConfig.class).isCoordinator() &&
-                buildConfigObject(CoordinatorAnnouncerConfig.class).isEnabled()) {
-
-            ConfigBinder.configBinder(binder).bindConfig(CoordinatorAnnouncerConfig.class);
-            binder.bind(EnvoyAnnouncementClient.class).in(Scopes.SINGLETON);
-            HttpClientBinder.httpClientBinder(binder).bindHttpClient("envoy", ForEnvoyAnnouncement.class);
-            binder.bind(EnvoyAnnouncer.class).in(Scopes.SINGLETON);
-        }
-
+        ConfigBinder.configBinder(binder).bindConfig(CoordinatorAnnouncerConfig.class);
+        binder.bind(EnvoyAnnouncementClient.class).in(Scopes.SINGLETON);
+        HttpClientBinder.httpClientBinder(binder).bindHttpClient("envoy", ForEnvoyAnnouncement.class);
+        binder.bind(EnvoyAnnouncer.class).in(Scopes.SINGLETON);
     }
 }

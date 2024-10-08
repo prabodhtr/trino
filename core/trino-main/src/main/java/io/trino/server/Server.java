@@ -188,14 +188,13 @@ public class Server
 
             if (injector.getInstance(ServerConfig.class).isCoordinator()) {
                 injector.getInstance(EventListenerManager.class).loadEventListeners();
+                injector.getInstance(EnvoyAnnouncer.class).start();
             }
 
             injector.getInstance(Key.get(new TypeLiteral<Optional<OAuth2Client>>() {}))
                     .ifPresent(OAuth2Client::load);
 
             injector.getInstance(Announcer.class).start();
-
-            injector.getInstance(EnvoyAnnouncer.class).start();
 
             injector.getInstance(StartupStatus.class).startupComplete();
             log.info("Server startup completed in %s", Duration.nanosSince(startTime).convertToMostSuccinctTimeUnit());
